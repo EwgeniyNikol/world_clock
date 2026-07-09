@@ -56,8 +56,9 @@ function WorldClockForm({ onAdd }: WorldClockFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim() && timezone !== '') {
-      onAdd(name.trim(), Number(timezone));
+    const tz = Number(timezone);
+    if (name.trim() && timezone !== '' && tz >= -12 && tz <= 14) {
+      onAdd(name.trim(), tz);
       setName('');
       setTimezone('');
       setSuggestions([]);
@@ -95,7 +96,7 @@ function WorldClockForm({ onAdd }: WorldClockFormProps) {
           <input
             type="number"
             className="form-control"
-            placeholder="UTC смещение"
+            placeholder="UTC (-12...+14)"
             value={timezone}
             onChange={(e) => setTimezone(e.target.value ? Number(e.target.value) : '')}
             step="0.5"

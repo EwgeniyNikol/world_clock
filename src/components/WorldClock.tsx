@@ -1,36 +1,23 @@
-import { useState, useEffect } from 'react';
 import './WorldClock.css';
 
 interface WorldClockProps {
   id: number;
   name: string;
   timezone: number;
+  currentTime: number;
   onRemove: (id: number) => void;
 }
 
-function WorldClock({ id, name, timezone, onRemove }: WorldClockProps) {
-  const [angles, setAngles] = useState({ hour: 0, minute: 0, second: 0 });
+function WorldClock({ id, name, timezone, currentTime, onRemove }: WorldClockProps) {
+  const utc = currentTime + new Date().getTimezoneOffset() * 60000;
+  const cityTime = new Date(utc + timezone * 3600000);
+  const hours = cityTime.getHours();
+  const minutes = cityTime.getMinutes();
+  const seconds = cityTime.getSeconds();
 
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      const cityTime = new Date(utc + timezone * 3600000);
-      const hours = cityTime.getHours();
-      const minutes = cityTime.getMinutes();
-      const seconds = cityTime.getSeconds();
-
-      setAngles({
-        hour: (hours % 12) * 30 + minutes * 0.5,
-        minute: minutes * 6 + seconds * 0.1,
-        second: seconds * 6,
-      });
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, [timezone]);
+  const hourAngle = (hours % 12) * 30 + minutes * 0.5;
+  const minuteAngle = minutes * 6 + seconds * 0.1;
+  const secondAngle = seconds * 6;
 
   return (
     <div className="clock-card">
@@ -40,9 +27,9 @@ function WorldClock({ id, name, timezone, onRemove }: WorldClockProps) {
             <span style={{ transform: `rotate(-${n * 30}deg)` }}>{n}</span>
           </div>
         ))}
-        <div className="hand hour" style={{ transform: `rotate(${angles.hour}deg)` }} />
-        <div className="hand minute" style={{ transform: `rotate(${angles.minute}deg)` }} />
-        <div className="hand second" style={{ transform: `rotate(${angles.second}deg)` }} />
+        <div className="hand hour" style={{ transform: `rotate(${hourAngle}deg)` }} />
+        <div className="hand minute" style={{ transform: `rotate(${minuteAngle}deg)` }} />
+        <div className="hand second" style={{ transform: `rotate(${secondAngle}deg)` }} />
         <div className="center-dot" />
       </div>
       <div className="clock-name">{name}</div>

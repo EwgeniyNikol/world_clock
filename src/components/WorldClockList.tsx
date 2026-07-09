@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WorldClockForm from './WorldClockForm';
 import WorldClock from './WorldClock';
 
@@ -16,6 +16,14 @@ const defaultClocks: ClockItem[] = [
 
 function WorldClockList() {
   const [clocks, setClocks] = useState<ClockItem[]>(defaultClocks);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleAdd = (name: string, timezone: number) => {
     const newClock: ClockItem = {
@@ -40,6 +48,7 @@ function WorldClockList() {
             id={clock.id}
             name={clock.name}
             timezone={clock.timezone}
+            currentTime={currentTime}
             onRemove={handleRemove}
           />
         ))}
